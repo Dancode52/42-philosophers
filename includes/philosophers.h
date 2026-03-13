@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/13 17:09:06 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/13 17:10:18 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct s_sim
 	t_philo	philo[1024];
 	pthread_mutex_t *mutex;
 	int		death;
-	int		*fork;
+	int		*literalfork;
 
 }	t_sim;
 

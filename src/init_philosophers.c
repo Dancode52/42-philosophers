@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/13 17:02:06 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/13 17:12:51 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,11 @@ int	init_sim(int argc, char **argv, t_sim *sim, pthread_mutex_t *mutex)
 	else
 		sim->no_of_meals = -1;
 	sim->death = 0;
-	sim->fork = malloc(sim->no_of_philos * sizeof(int));
-	if (!sim->fork)
+	sim->literalfork = malloc(sim->no_of_philos * sizeof(int));
+	if (!sim->literalfork)
 		return (1);
 	while (i < sim->no_of_philos)
-		sim->fork[i] = 1;
+		sim->literalfork[i] = 1;
 	sim->mutex = mutex;
 	return (0);
 }
