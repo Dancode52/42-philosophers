@@ -1,0 +1,40 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
+/*   Updated: 2026/03/13 15:58:59 by dlanehar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef PHILOSOPHERS_H
+# define PHILOSOPHERS_H
+# include <stdio.h>
+# include <pthread.h>
+# include <unistd.h>
+#include <sys/time.h>
+
+typedef struct s_philo
+{
+	int			id;
+	pthread_t	philo_t;
+}	t_philo;
+
+typedef struct s_sim
+{
+	int		no_of_philos;
+	int		time_to_die;
+	int		time_to_eat;
+	int		time_to_sleep;
+	int		no_of_meals;
+	t_philo	philo[1024];
+	int		death;
+
+}	t_sim;
+
+int	init_sim(int argc, char **argv, t_sim *sim);
+
+#endif
