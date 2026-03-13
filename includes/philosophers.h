@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/13 15:58:59 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/13 17:09:06 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 # include <stdio.h>
 # include <pthread.h>
 # include <unistd.h>
-#include <sys/time.h>
+# include <sys/time.h>
 
 typedef struct s_philo
 {
@@ -31,10 +31,12 @@ typedef struct s_sim
 	int		time_to_sleep;
 	int		no_of_meals;
 	t_philo	philo[1024];
+	pthread_mutex_t *mutex;
 	int		death;
+	int		*fork;
 
 }	t_sim;
 
-int	init_sim(int argc, char **argv, t_sim *sim);
+int	init_sim(int argc, char **argv, t_sim *sim, pthread_mutex_t *mutex);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/13 15:59:17 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/13 17:02:06 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,11 @@ static int	ft_atoi(const char *str)
 	return (nb * s);
 }
 
-int	init_sim(int argc, char **argv, t_sim *sim)
+int	init_sim(int argc, char **argv, t_sim *sim, pthread_mutex_t *mutex)
 {
+	int	i;
+
+	i = 0;
 	sim->no_of_philos = ft_atoi(argv[1]);
 	sim->time_to_die = ft_atoi(argv[2]);
 	sim->time_to_eat = ft_atoi(argv[3]);
@@ -50,4 +53,11 @@ int	init_sim(int argc, char **argv, t_sim *sim)
 	else
 		sim->no_of_meals = -1;
 	sim->death = 0;
+	sim->fork = malloc(sim->no_of_philos * sizeof(int));
+	if (!sim->fork)
+		return (1);
+	while (i < sim->no_of_philos)
+		sim->fork[i] = 1;
+	sim->mutex = mutex;
+	return (0);
 }
