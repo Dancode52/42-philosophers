@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/16 15:54:53 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/16 16:02:27 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,12 @@ void	free_and_destroy(t_sim *sim, int j)
 
 	i = 0;
 	while (i < j)
+	{
+		pthread_mutex_destroy(&sim->literalfork[i]);
+		i++;
+	}
+	free(sim->literalfork);
+	return ;
 }
 
 void	*do_stuff(void *param)
