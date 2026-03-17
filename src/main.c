@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/16 16:02:27 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/17 11:25:52 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,40 +26,78 @@ void	free_and_destroy(t_sim *sim, int j)
 	return ;
 }
 
-void	*do_stuff(void *param)
+size_t	get_time_in_ms(void)
 {
-	t_philo	*philosopher;
-	philosopher = (t_philo *)param;
-	int		id;
+	int		stms;
+	int		ustms;
+	struct timeval	time;
 
-	id = philosopher->id - 1;
+	gettimeofday(&time, NULL);
+	stms = time.tv_sec * 1000;
+	ustms = time.tv_usec / 1000;
+	return (stms + ustms);
+}
 
-	int		n = philosopher->mainsim->no_of_philos;
-	int		rfork = (((id + 1) % n) + n) % n;
-	int		lfork = (((id - 1) % n) + n) % n;
+void *do_stuff(void *param)
+{
+	t_philo	*philo;
+	int		pos;
+	int		no_philos;
+	int		lastmeal;
 
-
-	printf("id = %d\n", id);
-	pthread_mutex_lock(philosopher->mainsim->mutex1);
-	philosopher->mainsim->literalfork[rfork] = 0;
-	philosopher->mainsim->literalfork[lfork] = 0;
-	printf("id - 1 mod n: %d id + 1 mod n: %d\n", lfork, rfork);
-	printf("Thread: %d l fork: %d r fork: %d\n", id, philosopher->mainsim->literalfork[lfork], philosopher->mainsim->literalfork[rfork]);
-	pthread_mutex_unlock(philosopher->mainsim->mutex1);
-	// stop traking last meal here. he is eating. saves timer and should be checked.
-	//usleep(philosopher->mainsim->time_to_eat);
-	usleep(50);
-	// get "last meal" time start here. This is the point just after eating.
-	pthread_mutex_lock(philosopher->mainsim->mutex2);
-	philosopher->mainsim->literalfork[rfork] = 1;
-	philosopher->mainsim->literalfork[lfork] = 1;
-	printf("id - 1 mod n: %d id + 1 mod n: %d\n", lfork, rfork);
-	printf("Thread: %d l fork: %d r fork: %d\n", id, philosopher->mainsim->literalfork[lfork], philosopher->mainsim->literalfork[rfork]);
-	pthread_mutex_unlock(philosopher->mainsim->mutex2);
-	// set sleep time here.
-	usleep(philosopher->mainsim->time_to_sleep);
+	for (int f = 0; f < 10; f++){
+		philo = (t_philo *)param;
+		pos = philo->id - 1;
+		no_philos = philo->mainsim->no_of_philos;
+		// try and take fork to eat
+		pthread_mutex_lock(&philo->mainsim->literalfork[pos]);
+		pthread_mutex_lock(&philo->mainsim->literalfork[(pos + 1) % no_philos]);
+		// eat
+		usleep(philo->mainsim->time_to_eat * 1000);
+		printf("Thread %d is eating!\nI have eaten %d meals!\n\n", philo->id, f+1);
+		// give back forks
+		pthread_mutex_unlock(&philo->mainsim->literalfork[pos]);
+		pthread_mutex_unlock(&philo->mainsim->literalfork[(pos + 1) % no_philos]);
+		// sleep
+		printf("Thread %d is sleeping! Good night!\n\n", philo->id);
+		usleep(philo->mainsim->time_to_sleep);
+	}
 	return (NULL);
 }
+
+// void	*do_stuff(void *param)
+// {
+// 	t_philo	*philosopher;
+// 	philosopher = (t_philo *)param;
+// 	int		id;
+
+// 	id = philosopher->id - 1;
+
+// 	int		n = philosopher->mainsim->no_of_philos;
+// 	int		rfork = (((id + 1) % n) + n) % n;
+// 	int		lfork = (((id - 1) % n) + n) % n;
+
+// 	printf("id = %d\n", id);
+// 	pthread_mutex_lock(philosopher->mainsim->mutex1);
+// 	philosopher->mainsim->literalfork[rfork] = 0;
+// 	philosopher->mainsim->literalfork[lfork] = 0;
+// 	printf("id - 1 mod n: %d id + 1 mod n: %d\n", lfork, rfork);
+// 	printf("Thread: %d l fork: %d r fork: %d\n", id, philosopher->mainsim->literalfork[lfork], philosopher->mainsim->literalfork[rfork]);
+// 	pthread_mutex_unlock(philosopher->mainsim->mutex1);
+// 	// stop traking last meal here. he is eating. saves timer and should be checked.
+// 	//usleep(philosopher->mainsim->time_to_eat);
+// 	usleep(50);
+// 	// get "last meal" time start here. This is the point just after eating.
+// 	pthread_mutex_lock(philosopher->mainsim->mutex2);
+// 	philosopher->mainsim->literalfork[rfork] = 1;
+// 	philosopher->mainsim->literalfork[lfork] = 1;
+// 	printf("id - 1 mod n: %d id + 1 mod n: %d\n", lfork, rfork);
+// 	printf("Thread: %d l fork: %d r fork: %d\n", id, philosopher->mainsim->literalfork[lfork], philosopher->mainsim->literalfork[rfork]);
+// 	pthread_mutex_unlock(philosopher->mainsim->mutex2);
+// 	// set sleep time here.
+// 	usleep(philosopher->mainsim->time_to_sleep);
+// 	return (NULL);
+// }
 
 int	main(int argc, char **argv)
 {
@@ -94,8 +132,6 @@ int	main(int argc, char **argv)
 	i = 0;
 	while (i < sim.no_of_philos)
 	{
-		sim.mutex1 = &mutex1;
-		sim.mutex2 = &mutex2;
 		sim.philo[i].id = i + 1;
 		sim.philo[i].mainsim = &sim;
 		pthread_create(&sim.philo[i].philo_t, NULL, do_stuff, &sim.philo[i]);
@@ -107,8 +143,18 @@ int	main(int argc, char **argv)
 		pthread_join(sim.philo[i].philo_t, NULL);
 		i++;
 	}
-	pthread_mutex_destroy(&mutex1);
-	pthread_mutex_destroy(&mutex2);
+	j = 0;
+	while (j < sim.no_of_philos)
+	{
+		// make forks a table of mutexes
+		error = pthread_mutex_destroy(&sim.literalfork[j]);
+		if (error != 0)
+		{
+			printf("Bro, at this point throw the whole pc out...\n");
+			return (1);
+		}
+		j++;
+	}
 	free(sim.literalfork);
 	return (0);
 }
