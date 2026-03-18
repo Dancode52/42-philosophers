@@ -6,129 +6,96 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/17 11:25:52 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/18 18:39:44 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void	free_and_destroy(t_sim *sim, int j)
+static void *monitoring(void *param)
 {
+	t_sim *sim;
 	int	i;
 
+	sim = (t_sim *)param;
 	i = 0;
-	while (i < j)
+	while(1 && sim->death == 0)
 	{
-		pthread_mutex_destroy(&sim->literalfork[i]);
-		i++;
-	}
-	free(sim->literalfork);
-	return ;
-}
-
-size_t	get_time_in_ms(void)
-{
-	int		stms;
-	int		ustms;
-	struct timeval	time;
-
-	gettimeofday(&time, NULL);
-	stms = time.tv_sec * 1000;
-	ustms = time.tv_usec / 1000;
-	return (stms + ustms);
-}
-
-void *do_stuff(void *param)
-{
-	t_philo	*philo;
-	int		pos;
-	int		no_philos;
-	int		lastmeal;
-
-	for (int f = 0; f < 10; f++){
-		philo = (t_philo *)param;
-		pos = philo->id - 1;
-		no_philos = philo->mainsim->no_of_philos;
-		// try and take fork to eat
-		pthread_mutex_lock(&philo->mainsim->literalfork[pos]);
-		pthread_mutex_lock(&philo->mainsim->literalfork[(pos + 1) % no_philos]);
-		// eat
-		usleep(philo->mainsim->time_to_eat * 1000);
-		printf("Thread %d is eating!\nI have eaten %d meals!\n\n", philo->id, f+1);
-		// give back forks
-		pthread_mutex_unlock(&philo->mainsim->literalfork[pos]);
-		pthread_mutex_unlock(&philo->mainsim->literalfork[(pos + 1) % no_philos]);
-		// sleep
-		printf("Thread %d is sleeping! Good night!\n\n", philo->id);
-		usleep(philo->mainsim->time_to_sleep);
+		if(sim->philo[i].lastmeal > sim->time_to_die)
+		{
+			printf("PHILOSOPHER [%d] DIED!!\n", i + 1);
+			sim->death = 1;
+			return (NULL);
+		}
+		i = (i + 1) % sim->no_of_philos;
 	}
 	return (NULL);
 }
 
-// void	*do_stuff(void *param)
-// {
-// 	t_philo	*philosopher;
-// 	philosopher = (t_philo *)param;
-// 	int		id;
+size_t	get_time_in_ms(void)
+{
+	struct timeval	time;
 
-// 	id = philosopher->id - 1;
+	gettimeofday(&time, NULL);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+}
 
-// 	int		n = philosopher->mainsim->no_of_philos;
-// 	int		rfork = (((id + 1) % n) + n) % n;
-// 	int		lfork = (((id - 1) % n) + n) % n;
+int	ft_usleep(size_t ms, t_sim *sim)
+{
+	size_t	start;
 
-// 	printf("id = %d\n", id);
-// 	pthread_mutex_lock(philosopher->mainsim->mutex1);
-// 	philosopher->mainsim->literalfork[rfork] = 0;
-// 	philosopher->mainsim->literalfork[lfork] = 0;
-// 	printf("id - 1 mod n: %d id + 1 mod n: %d\n", lfork, rfork);
-// 	printf("Thread: %d l fork: %d r fork: %d\n", id, philosopher->mainsim->literalfork[lfork], philosopher->mainsim->literalfork[rfork]);
-// 	pthread_mutex_unlock(philosopher->mainsim->mutex1);
-// 	// stop traking last meal here. he is eating. saves timer and should be checked.
-// 	//usleep(philosopher->mainsim->time_to_eat);
-// 	usleep(50);
-// 	// get "last meal" time start here. This is the point just after eating.
-// 	pthread_mutex_lock(philosopher->mainsim->mutex2);
-// 	philosopher->mainsim->literalfork[rfork] = 1;
-// 	philosopher->mainsim->literalfork[lfork] = 1;
-// 	printf("id - 1 mod n: %d id + 1 mod n: %d\n", lfork, rfork);
-// 	printf("Thread: %d l fork: %d r fork: %d\n", id, philosopher->mainsim->literalfork[lfork], philosopher->mainsim->literalfork[rfork]);
-// 	pthread_mutex_unlock(philosopher->mainsim->mutex2);
-// 	// set sleep time here.
-// 	usleep(philosopher->mainsim->time_to_sleep);
-// 	return (NULL);
-// }
+	(void)sim;
+	start = get_time_in_ms();
+	while ((get_time_in_ms() - start) < ms)
+	{
+		// if (sim->death)
+		// 	return (1);
+		usleep(500);
+	}
+	return (0);
+}
+
+void *do_stuff(void *param)
+{
+	t_philo		*philo;
+	int			pos;
+	int			no_philos;
+	size_t		start;
+
+	philo = (t_philo *)param;
+	start = get_time_in_ms() - philo->mainsim->basetime;
+	pos = philo->id - 1;
+	no_philos = philo->mainsim->no_of_philos;
+	if (philo->id % 2 == 1)
+		ft_usleep(philo->mainsim->time_to_eat, philo->mainsim);
+	for (int f = 0; f != philo->mainsim->no_of_meals; f++){
+		grab_forks(philo);
+		if (philo->lastmeal > philo->mainsim->time_to_die)
+		{
+			pthread_mutex_lock(&philo->mainsim->printfprotect);
+			printf("HERE LIES PHILOSOPHER[%d]. DIED OF STARVATION\n", philo->id);
+			pthread_mutex_unlock(&philo->mainsim->printfprotect);
+		}
+		eat_sleep(philo, &start);
+	}
+	return (NULL);
+}
 
 int	main(int argc, char **argv)
 {
 	t_sim	sim;
-	pthread_mutex_t mutex1;
-	pthread_mutex_t mutex2;
 	int i;
 	int j;
 	int error;
+	pthread_t	monitor;
 
+	sim.basetime = get_time_in_ms();
 	i = 0;
 	j = 0;
 	if (argc < 5 || argc > 6)
 		return (1);
-	pthread_mutex_init(&mutex1, NULL);
-	pthread_mutex_init(&mutex2, NULL);
-	if (init_sim(argc, argv, &sim, &mutex1))
+	if (init_sim(argv, &sim) != 0)
 		return (1);
-	sim.literalfork = malloc(sim.no_of_philos * sizeof(pthread_mutex_t));
-	while (j < sim.no_of_philos)
-	{
-		// make forks a table of mutexes
-		error = pthread_mutex_init(&sim.literalfork[j], NULL);
-		if (error != 0)
-		{
-			free_and_destroy(&sim, j);
-			return (1);
-		}
-		j++;
-		printf("no of forks = %d\n", j);
-	}
 	i = 0;
 	while (i < sim.no_of_philos)
 	{
@@ -137,6 +104,7 @@ int	main(int argc, char **argv)
 		pthread_create(&sim.philo[i].philo_t, NULL, do_stuff, &sim.philo[i]);
 		i++;
 	}
+	pthread_create(&monitor, NULL, monitoring, &sim);
 	i = 0;
 	while (i < sim.no_of_philos)
 	{
@@ -155,6 +123,7 @@ int	main(int argc, char **argv)
 		}
 		j++;
 	}
+	pthread_mutex_destroy(&sim.printfprotect);
 	free(sim.literalfork);
 	return (0);
 }

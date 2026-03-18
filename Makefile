@@ -6,7 +6,7 @@ CFLAGS := -Wall -Werror -Wextra -g -I includes#-fsanitize=address
 SRC_DIR := src
 SRC_BONUS_DIR := src_bonus
 
-SRC := main.c init_philosophers.c
+SRC := main.c init_philosophers.c philostuff.c helpers.c
 
 SRC_BONUS :=
 
