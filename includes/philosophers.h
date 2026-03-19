@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/19 10:31:03 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/19 18:38:38 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,23 @@
 
 typedef	struct	s_sim	t_sim;
 
+typedef enum e_msg_type
+{
+    MSG_FORK,
+    MSG_EAT,
+    MSG_SLEEP,
+    MSG_THINK,
+    MSG_DIED
+} t_msg_type;
+
 typedef	struct	s_philo
 {
-	int				id;
-	pthread_t		philo_t;
-	int				lastmeal;
-	t_sim			*mainsim;
+	int			index;
+	int			id;
+	pthread_t	philo_t;
+	size_t		last_meal;
+	int			meals_eaten;
+	t_sim		*sim;
 }	t_philo;
 
 typedef struct s_sim
@@ -36,13 +47,14 @@ typedef struct s_sim
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				no_of_meals;
-	t_philo			philo[1024];
 	int				death;
-	pthread_mutex_t	*literalfork;
-	pthread_mutex_t	printfprotect;
-	size_t			basetime;
+	size_t			progstart;
+	t_philo			*philos;
 	pthread_t		monitor;
-
+	pthread_mutex_t	*fork_mutex;
+	pthread_mutex_t	*meal_mutex;
+	pthread_mutex_t	printf_mutex;
+	pthread_mutex_t	death_mutex;
 }	t_sim;
 
 int		init_sim(char **argv, t_sim *sim);
@@ -54,8 +66,14 @@ void	printsleepmsg(t_philo *philo, size_t garbage);
 void	eat_sleep(t_philo *philo, size_t *start);
 int		ft_usleep(size_t ms, t_sim *sim);
 void	*monitoring(void *param);
-void	*do_stuff(void *param);
+void	*philo_routine(void *param);
 int		make_threads(t_sim *sim);
 int		destroy_mutexes(t_sim *sim);
+void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j);
+int		death_checker(t_sim *sim);
+int		meal_checker(t_sim *sim, int index);
+int		init_mutexes(t_sim *sim);
+int		mutex_init_loop(t_sim *sim, pthread_mutex_t *ptr);
+int		ph_eating(t_philo *philos, int index);
 
 #endif

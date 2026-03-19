@@ -6,49 +6,68 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/19 09:57:31 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/19 17:12:57 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-static void	free_and_destroy(t_sim *sim, int j)
+int	mutex_init_loop(t_sim *sim, pthread_mutex_t *ptr)
+{
+	int	i;
+	int	error;
+
+	i = 0;
+	while (i < sim->no_of_philos)
+	{
+		error = pthread_mutex_init(&ptr[i], NULL);
+		if (error != 0)
+		{
+			free_and_destroy(sim, ptr, i);
+			return (1);
+		}
+		i++;
+	}
+	return (0);
+}
+
+void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j)
 {
 	int	i;
 
 	i = 0;
 	while (i < j)
 	{
-		pthread_mutex_destroy(&sim->literalfork[i]);
+		pthread_mutex_destroy(&ptr[i]);
 		i++;
 	}
-	free(sim->literalfork);
+	if (sim->fork_mutex)
+		free(sim->fork_mutex);
+	if (sim->philos)
+		free(sim->philos);
 	return ;
 }
 
-static int	init_mutex(t_sim *sim)
+static int	create_mutex(t_sim *sim)
 {
 	int	j;
-	int	error;
+	int	error1;
 
 	j = 0;
-	sim->literalfork = malloc(sim->no_of_philos * sizeof(pthread_mutex_t));
-	while (j < sim->no_of_philos)
+	printf("made it to create mutex\n");
+	sim->fork_mutex = malloc(sim->no_of_philos * sizeof(pthread_mutex_t));
+	if (!sim->fork_mutex)
+		return (1);
+	sim->meal_mutex = malloc(sim->no_of_philos * sizeof(pthread_mutex_t));
+	if (!sim->meal_mutex)
 	{
-		error = pthread_mutex_init(&sim->literalfork[j], NULL);
-		if (error != 0)
-		{
-			free_and_destroy(sim, j);
-			return (1);
-		}
-		j++;
-		printf("no of forks = %d\n", j);
-	}
-	if (pthread_mutex_init(&sim->printfprotect, NULL) != 0)
-	{
-		free_and_destroy(sim, j);
+		free(sim->fork_mutex);
+		free(sim->philos);
 		return (1);
 	}
+	error1 = init_mutexes(sim);
+	if (error1 != 0)
+		return (1);
 	return (0);
 }
 
@@ -81,9 +100,8 @@ static int	ft_atoi(const char *str)
 
 int	init_sim(char **argv, t_sim *sim)
 {
-	int	i;
-
-	i = 0;
+	memset(sim, 0, sizeof(t_sim));
+	sim->progstart = get_time_in_ms();
 	sim->no_of_philos = ft_atoi(argv[1]);
 	sim->time_to_die = ft_atoi(argv[2]);
 	sim->time_to_eat = ft_atoi(argv[3]);
@@ -95,8 +113,11 @@ int	init_sim(char **argv, t_sim *sim)
 		sim->no_of_meals = ft_atoi(argv[5]);
 	else
 		sim->no_of_meals = -1;
-	sim->death = 0;
-	if (init_mutex(sim) != 0)
+	sim->philos = malloc(sim->no_of_philos * sizeof(t_philo));
+	if (!sim->philos)
+		return (1);
+	memset(sim->philos, 0, sim->no_of_philos * sizeof(t_philo));
+	if (create_mutex(sim) != 0)
 		return (1);
 	return (0);
 }
