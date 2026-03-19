@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/18 18:39:02 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/19 10:01:49 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@ void	printsleepmsg(t_philo *philo, size_t garbage)
 
 void	eat_sleep(t_philo *philo, size_t *start)
 {
-	size_t		eat_time;
+	size_t	eat_time;
 	size_t	garbage;
+
 	garbage = get_time_in_ms() - philo->mainsim->basetime;
 	printeatmsg(philo, garbage);
 	eat_time = get_time_in_ms() - philo->mainsim->basetime;

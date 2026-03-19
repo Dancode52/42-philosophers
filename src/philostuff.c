@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 16:40:46 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/18 17:23:33 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/19 10:01:18 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ static	void	odd_forks(t_philo *philo, int nphil, int pos)
 	printf("| %zu | %d has taken a fork.\n", garbage, philo->id);
 	pthread_mutex_unlock(&philo->mainsim->printfprotect);
 }
+
 static	void	even_forks(t_philo *philo, int nphil, int pos)
 {
 	size_t	garbage;
@@ -65,12 +66,14 @@ void	return_forks(t_philo *philo)
 	no_philos = philo->mainsim->no_of_philos;
 	if (philo->id % 2 == 1)
 	{
-		pthread_mutex_unlock(&philo->mainsim->literalfork[(pos + 1) % no_philos]);
+		pthread_mutex_unlock(&philo->mainsim->literalfork[(pos + 1)
+			% no_philos]);
 		pthread_mutex_unlock(&philo->mainsim->literalfork[pos]);
 	}
 	else
 	{
 		pthread_mutex_unlock(&philo->mainsim->literalfork[pos]);
-		pthread_mutex_unlock(&philo->mainsim->literalfork[(pos + 1) % no_philos]);
+		pthread_mutex_unlock(&philo->mainsim->literalfork[(pos + 1)
+			% no_philos]);
 	}
 }

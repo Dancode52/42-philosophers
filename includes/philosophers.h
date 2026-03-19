@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/18 18:30:03 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/19 10:31:03 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 # include <unistd.h>
 # include <sys/time.h>
 
-typedef struct s_sim t_sim;
+typedef	struct	s_sim	t_sim;
 
-typedef struct s_philo
+typedef	struct	s_philo
 {
 	int				id;
 	pthread_t		philo_t;
@@ -41,6 +41,7 @@ typedef struct s_sim
 	pthread_mutex_t	*literalfork;
 	pthread_mutex_t	printfprotect;
 	size_t			basetime;
+	pthread_t		monitor;
 
 }	t_sim;
 
@@ -51,6 +52,10 @@ size_t	get_time_in_ms(void);
 void	printeatmsg(t_philo *philo, size_t garbage);
 void	printsleepmsg(t_philo *philo, size_t garbage);
 void	eat_sleep(t_philo *philo, size_t *start);
-int	ft_usleep(size_t ms, t_sim *sim);
+int		ft_usleep(size_t ms, t_sim *sim);
+void	*monitoring(void *param);
+void	*do_stuff(void *param);
+int		make_threads(t_sim *sim);
+int		destroy_mutexes(t_sim *sim);
 
 #endif

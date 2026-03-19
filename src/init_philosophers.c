@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/18 16:59:05 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/19 09:57:31 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ static int	init_mutex(t_sim *sim)
 	sim->literalfork = malloc(sim->no_of_philos * sizeof(pthread_mutex_t));
 	while (j < sim->no_of_philos)
 	{
-		// make forks a table of mutexes
 		error = pthread_mutex_init(&sim->literalfork[j], NULL);
 		if (error != 0)
 		{
@@ -91,7 +90,7 @@ int	init_sim(char **argv, t_sim *sim)
 	sim->time_to_sleep = ft_atoi(argv[4]);
 	if (sim->no_of_philos < 0 || sim->time_to_die < 0 || sim->time_to_eat < 0
 		|| sim->time_to_sleep < 0)
-			return (1);
+		return (1);
 	if (argv[5])
 		sim->no_of_meals = ft_atoi(argv[5]);
 	else
