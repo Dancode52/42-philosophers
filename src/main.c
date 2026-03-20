@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/19 18:38:48 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/20 08:57:08 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,39 @@ void	free_things(t_sim *sim)
 		free(sim->philos);
 }
 
+int	check_starvation(t_sim *sim, int index)
+{
+	int	starvation;
+	int	current_time;
+
+	current_time = get_time_in_ms();
+	starvation = 0;
+	pthread_mutex_lock(sim->meal_mutex);
+	if (current_time - sim->philos[index].last_meal > sim->time_to_die)
+		starvation = 1;
+	pthread_mutex_unlock(sim->meal_mutex);
+	return (starvation);
+}
+
 void	*monitoring(void *param)
 {
 	t_sim	*sim;
+	int		i;
 
 	sim = (t_sim *)param;
-
-	// if (/*we find out someone died*/)
-	// {
-	// 	pthread_mutex_lock(&sim->death_mutex);
-	// 	sim->death = 1;
-	// 	pthread_mutex_unlock(&sim->death_mutex);
-	// }
+	i = 0;
+	while (!death_checker(sim))
+	{
+		while (i < sim->no_of_philos)
+		{
+			if (/*we find out someone died*/)
+			{
+				pthread_mutex_lock(&sim->death_mutex);
+				sim->death = 1;
+				pthread_mutex_unlock(&sim->death_mutex);
+			}
+		}
+	}
 
 	return (NULL);
 }

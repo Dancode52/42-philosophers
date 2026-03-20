@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/19 18:38:38 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/20 08:40:12 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,8 @@ int		meal_checker(t_sim *sim, int index);
 int		init_mutexes(t_sim *sim);
 int		mutex_init_loop(t_sim *sim, pthread_mutex_t *ptr);
 int		ph_eating(t_philo *philos, int index);
+void	odd_eat(t_philo *philos, int index);
+void	even_eat(t_philo *philos, int index);
+void	print_msg(t_philo *philos, t_msg_type type);
 
 #endif

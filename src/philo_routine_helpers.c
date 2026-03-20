@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/19 18:39:11 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/03/20 08:46:15 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,32 +52,18 @@ int	meal_checker(t_sim *sim, int index)
 	pthread_mutex_unlock(&sim->meal_mutex[index]);
 	return (full);
 }
-
 int	ph_eating(t_philo *philos, int index)
 {
+	pthread_mutex_lock(philos->sim->meal_mutex);
+	philos->last_meal = get_time_in_ms();
+	pthread_mutex_lock(philos->sim->meal_mutex);
 	if (philos->id % 2 == 1)
 	{
-		pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
-		pthread_mutex_lock(&philos->sim->fork_mutex[(philos->index + 1) % philos->sim->no_of_philos]);
-		pthread_mutex_lock(&philos->sim->meal_mutex[index]);
-		philos->meals_eaten++;
-		pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
-		print_msg(philos, MSG_EAT);
-		ft_usleep(philos->sim->time_to_eat, philos->sim);
-		pthread_mutex_unlock(&philos->sim->fork_mutex[(philos->index + 1) % philos->sim->no_of_philos]);
-		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
+		odd_eat(philos, index);
 	}
 	else
 	{
-		pthread_mutex_lock(&philos->sim->fork_mutex[(philos->index + 1) % philos->sim->no_of_philos]);
-		pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
-		pthread_mutex_lock(&philos->sim->meal_mutex[index]);
-		philos->meals_eaten++;
-		pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
-		print_msg(philos, MSG_EAT);
-		ft_usleep(philos->sim->time_to_eat, philos->sim);
-		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
-		pthread_mutex_unlock(&philos->sim->fork_mutex[(philos->index + 1) % philos->sim->no_of_philos]);
+		even_eat(philos, index);
 	}
 	return (0);
 }
