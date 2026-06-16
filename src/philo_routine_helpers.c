@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/20 08:46:15 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/06/16 18:54:51 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,20 +50,21 @@ int	meal_checker(t_sim *sim, int index)
 	if (sim->philos[index].meals_eaten == sim->no_of_meals)
 		full = 1;
 	pthread_mutex_unlock(&sim->meal_mutex[index]);
+	if (full)
+		printf("P%d exiting because full\n", index);
 	return (full);
 }
 int	ph_eating(t_philo *philos, int index)
 {
-	pthread_mutex_lock(philos->sim->meal_mutex);
+	// printf("Philo %d entering eat\n", philos->id);
+	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
 	philos->last_meal = get_time_in_ms();
-	pthread_mutex_lock(philos->sim->meal_mutex);
+	printf("P%d updated last_meal = %zu\n", philos->id, philos->last_meal);
+	pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
 	if (philos->id % 2 == 1)
-	{
 		odd_eat(philos, index);
-	}
 	else
-	{
 		even_eat(philos, index);
-	}
+	// printf("Philo %d leaving eat\n", philos->id);
 	return (0);
 }

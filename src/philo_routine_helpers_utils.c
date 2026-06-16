@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/20 08:44:42 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/06/16 18:43:36 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 void	odd_eat(t_philo *philos, int index)
 {
 	pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
+	// printf("P%d locking first fork\n", philos->id);
 	pthread_mutex_lock(&philos->sim->fork_mutex[(philos->index + 1)
 		% philos->sim->no_of_philos]);
+	// printf("P%d locking second fork\n", philos->id);
 	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
 	philos->meals_eaten++;
 	pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
@@ -31,7 +33,9 @@ void	even_eat(t_philo *philos, int index)
 {
 	pthread_mutex_lock(&philos->sim->fork_mutex[(philos->index + 1)
 		% philos->sim->no_of_philos]);
+	// printf("P%d locking first fork\n", philos->id);
 	pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
+	// printf("P%d locking second fork\n", philos->id);
 	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
 	philos->meals_eaten++;
 	pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
