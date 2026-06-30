@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/06/16 19:06:35 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/06/30 15:56:20 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	*monitoring(void *param)
 				return (NULL);
 			};
 			i++;
-			ft_usleep(500, sim);
+			ft_usleep(300, sim);
 		}
 	}
 
@@ -108,18 +108,42 @@ void	*philo_routine(void *param)
 
 	philos = (t_philo *)param;
 
+	if (philos->sim->no_of_philos == 1)
+	{
+		pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
+		while(philos->sim->death != 1)
+			ft_usleep(100, philos->sim);
+		print_msg(philos, MSG_DIED);
+		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
+		return (NULL);
+	}
 	if (philos->id % 2 == 1)
 		ft_usleep(philos->sim->time_to_eat, philos->sim);
 	while (!death_checker(philos->sim))
 	{
 		//eating
+
 		ph_eating(philos, philos->index);
-		ft_usleep(philos->sim->time_to_sleep, philos->sim);
 		//sleeping
+		if (death_checker(philos->sim) || philos->meals_eaten >= philos->sim->no_of_meals)
+			return (NULL);
+		print_msg(philos, MSG_SLEEP);
+		ft_usleep(philos->sim->time_to_sleep, philos->sim);
 		//thinking
+		if (death_checker(philos->sim))
+			return (NULL);
+		print_msg(philos, MSG_THINK);
 	}
 	return (NULL);
 }
+
+// int	single_philo_func(t_sim *sim)
+// {
+// 	print_msg(&sim->philos[0], MSG_FORK);
+// 	ft_usleep(sim->time_to_die, sim);
+// 	print_msg(&sim->philos[0], MSG_DIED);
+// 	return (0);
+// }
 
 int	main(int argc, char **argv)
 {
@@ -137,6 +161,14 @@ int	main(int argc, char **argv)
 	error = make_threads(&sim);
 	if (error == 1)
 		return (1);
+	// if (sim.no_of_philos == 1)
+	// {
+	// 	// single_philo_func(&sim);
+	// 	pthread_join(sim.philos[0].philo_t, NULL);
+	// 	error = destroy_mutexes(&sim);
+	// 	free_things(&sim);
+	// 	return (0);
+	// }
 	while (i < sim.no_of_philos)
 	{
 		pthread_join(sim.philos[i].philo_t, NULL);

@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/06/16 18:54:51 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/06/30 14:36:50 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,12 @@ int	meal_checker(t_sim *sim, int index)
 int	ph_eating(t_philo *philos, int index)
 {
 	// printf("Philo %d entering eat\n", philos->id);
-	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
-	philos->last_meal = get_time_in_ms();
-	printf("P%d updated last_meal = %zu\n", philos->id, philos->last_meal);
-	pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
+	// pthread_mutex_lock(&philos->sim->meal_mutex[index]);
+	// philos->last_meal = get_time_in_ms();
+	// printf("P%d updated last_meal = %zu\n", philos->id, philos->last_meal);
+	// pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
+	if (death_checker(philos->sim))
+		return (0);
 	if (philos->id % 2 == 1)
 		odd_eat(philos, index);
 	else

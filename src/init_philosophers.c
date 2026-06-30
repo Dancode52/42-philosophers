@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/06/16 18:24:52 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/06/30 08:51:06 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static int	create_mutex(t_sim *sim)
 	int	error1;
 
 	// j = 0;
-	printf("made it to create mutex\n");
+	// printf("made it to create mutex\n");
 	sim->fork_mutex = malloc(sim->no_of_philos * sizeof(pthread_mutex_t));
 	if (!sim->fork_mutex)
 		return (1);

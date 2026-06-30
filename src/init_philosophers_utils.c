@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 16:43:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/06/16 18:23:13 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/06/30 08:51:01 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	init_mutexes(t_sim *sim)
 	int	error1;
 	int	error2;
 
-	printf("made it to init mutexes\n");
+	// printf("made it to init mutexes\n");
 	error1 = mutex_init_loop(sim, sim->fork_mutex);
 	if (error1 != 0)
 		return (1);

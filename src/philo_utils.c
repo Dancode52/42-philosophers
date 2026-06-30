@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 09:01:47 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/06/16 18:52:27 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/06/23 10:06:09 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ int	make_threads(t_sim *sim)
 		sim->philos[i].id = i + 1;
 		sim->philos[i].sim = sim;
 		sim->philos[i].last_meal = sim->progstart;
-		// printf("philo %d last meal = %zu\n", sim->philos[i].id, sim->philos[i].last_meal);
 		error = pthread_create(&sim->philos[i].philo_t, NULL, philo_routine,
 				&sim->philos[i]);
 		if (error != 0)
