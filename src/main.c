@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/06/30 15:56:20 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/01 13:29:41 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	*monitoring(void *param)
 				return (NULL);
 			};
 			i++;
-			ft_usleep(300, sim);
+			ft_usleep(5, sim);
 		}
 	}
 
@@ -112,7 +112,7 @@ void	*philo_routine(void *param)
 	{
 		pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
 		while(philos->sim->death != 1)
-			ft_usleep(100, philos->sim);
+			ft_usleep(5, philos->sim);
 		print_msg(philos, MSG_DIED);
 		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
 		return (NULL);
@@ -137,14 +137,6 @@ void	*philo_routine(void *param)
 	return (NULL);
 }
 
-// int	single_philo_func(t_sim *sim)
-// {
-// 	print_msg(&sim->philos[0], MSG_FORK);
-// 	ft_usleep(sim->time_to_die, sim);
-// 	print_msg(&sim->philos[0], MSG_DIED);
-// 	return (0);
-// }
-
 int	main(int argc, char **argv)
 {
 	t_sim	sim;
@@ -161,14 +153,13 @@ int	main(int argc, char **argv)
 	error = make_threads(&sim);
 	if (error == 1)
 		return (1);
-	// if (sim.no_of_philos == 1)
-	// {
-	// 	// single_philo_func(&sim);
-	// 	pthread_join(sim.philos[0].philo_t, NULL);
-	// 	error = destroy_mutexes(&sim);
-	// 	free_things(&sim);
-	// 	return (0);
-	// }
+	if (sim.no_of_philos == 1)
+	{
+		pthread_join(sim.philos[0].philo_t, NULL);
+		error = destroy_mutexes(&sim);
+		free_things(&sim);
+		return (0);
+	}
 	while (i < sim.no_of_philos)
 	{
 		pthread_join(sim.philos[i].philo_t, NULL);
