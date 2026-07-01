@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/06/30 08:51:06 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/01 15:45:10 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,8 @@ void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j)
 
 static int	create_mutex(t_sim *sim)
 {
-	// int	j;
 	int	error1;
 
-	// j = 0;
-	// printf("made it to create mutex\n");
 	sim->fork_mutex = malloc(sim->no_of_philos * sizeof(pthread_mutex_t));
 	if (!sim->fork_mutex)
 		return (1);
@@ -62,12 +59,15 @@ static int	create_mutex(t_sim *sim)
 	if (!sim->meal_mutex)
 	{
 		free(sim->fork_mutex);
-		free(sim->philos);
 		return (1);
 	}
 	error1 = init_mutexes(sim);
 	if (error1 != 0)
+	{
+		free(sim->fork_mutex);
+		free(sim->meal_mutex);
 		return (1);
+	}
 	return (0);
 }
 
@@ -118,6 +118,9 @@ int	init_sim(char **argv, t_sim *sim)
 		return (1);
 	memset(sim->philos, 0, sim->no_of_philos * sizeof(t_philo));
 	if (create_mutex(sim) != 0)
+	{
+		free(sim->philos);
 		return (1);
+	}
 	return (0);
 }

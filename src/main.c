@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/01 13:29:41 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/01 15:39:14 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,9 @@ int	check_starvation(t_sim *sim, int index)
 	starvation = 0;
 	pthread_mutex_lock(&sim->meal_mutex[index]);
 
-	// printf("MONITOR: P%d last_meal=%zu current=%zu diff=%zu\n",
-    //    index + 1,
-    //    sim->philos[index].last_meal,
-    //    current_time,
-    //    current_time - sim->philos[index].last_meal);
-
 	if (current_time - sim->philos[index].last_meal > (size_t)sim->time_to_die)
 		starvation = 1;
 	pthread_mutex_unlock(&sim->meal_mutex[index]);
-	// printf("Philo %d elapsed = %zu\n",
-    //    index + 1,
-    //    current_time - sim->philos[index].last_meal);
 	return (starvation);
 }
 
