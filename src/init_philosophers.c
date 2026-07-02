@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/01 15:45:10 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/02 12:51:31 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,23 +29,6 @@ int	mutex_init_loop(t_sim *sim, pthread_mutex_t *ptr)
 		i++;
 	}
 	return (0);
-}
-
-void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j)
-{
-	int	i;
-
-	i = 0;
-	while (i < j)
-	{
-		pthread_mutex_destroy(&ptr[i]);
-		i++;
-	}
-	if (sim->fork_mutex)
-		free(sim->fork_mutex);
-	if (sim->philos)
-		free(sim->philos);
-	return ;
 }
 
 static int	create_mutex(t_sim *sim)
@@ -71,32 +54,49 @@ static int	create_mutex(t_sim *sim)
 	return (0);
 }
 
-static int	ft_atoi(const char *str)
-{
-	int	i;
-	int	nb;
-	int	s;
+// void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j)
+// {
+// 	int	i;
 
-	i = 0;
-	nb = 0;
-	s = 1;
-	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
-		i++;
-	if (str[i] == '+' || str[i] == '-')
-	{
-		if (str[i] == '-')
-			s = s * -1;
-		i++;
-	}
-	if (!(str[i] >= '0' && str[i] <= '9'))
-		return (0);
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		nb = nb * 10 + (str[i] - '0');
-		i++;
-	}
-	return (nb * s);
-}
+// 	i = 0;
+// 	while (i < j)
+// 	{
+// 		pthread_mutex_destroy(&ptr[i]);
+// 		i++;
+// 	}
+// 	if (sim->fork_mutex)
+// 		free(sim->fork_mutex);
+// 	if (sim->philos)
+// 		free(sim->philos);
+// 	return ;
+// }
+
+// int	ft_atoi(const char *str)
+// {
+// 	int	i;
+// 	int	nb;
+// 	int	s;
+
+// 	i = 0;
+// 	nb = 0;
+// 	s = 1;
+// 	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+// 		i++;
+// 	if (str[i] == '+' || str[i] == '-')
+// 	{
+// 		if (str[i] == '-')
+// 			s = s * -1;
+// 		i++;
+// 	}
+// 	if (!(str[i] >= '0' && str[i] <= '9'))
+// 		return (0);
+// 	while (str[i] >= '0' && str[i] <= '9')
+// 	{
+// 		nb = nb * 10 + (str[i] - '0');
+// 		i++;
+// 	}
+// 	return (nb * s);
+// }
 
 int	init_sim(char **argv, t_sim *sim)
 {

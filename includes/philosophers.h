@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/03/20 08:40:12 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/02 12:51:03 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,5 +78,6 @@ int		ph_eating(t_philo *philos, int index);
 void	odd_eat(t_philo *philos, int index);
 void	even_eat(t_philo *philos, int index);
 void	print_msg(t_philo *philos, t_msg_type type);
+int		ft_atoi(const char *str);
 
 #endif
