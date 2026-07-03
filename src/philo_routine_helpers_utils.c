@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/02 13:29:27 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/03 11:15:47 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,18 @@
 void	odd_eat(t_philo *philos, int index)
 {
 	pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
-	print_msg(philos, MSG_FORK);
+	if (!death_checker(philos->sim))
+		print_msg(philos, MSG_FORK);
 	pthread_mutex_lock(&philos->sim->fork_mutex[(philos->index + 1)
 		% philos->sim->no_of_philos]);
-	print_msg(philos, MSG_FORK);
-	// printf("P%d locking second fork\n", philos->id);
+	if (!death_checker(philos->sim))
+		print_msg(philos, MSG_FORK);
 	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
 	philos->last_meal = get_time_in_ms();
 	philos->meals_eaten++;
 	pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
-	print_msg(philos, MSG_EAT);
+	if (!death_checker(philos->sim))
+		print_msg(philos, MSG_EAT);
 	ft_usleep(philos->sim->time_to_eat, philos->sim);
 	pthread_mutex_unlock(&philos->sim->fork_mutex[(philos->index + 1)
 		% philos->sim->no_of_philos]);
@@ -35,17 +37,19 @@ void	even_eat(t_philo *philos, int index)
 {
 	pthread_mutex_lock(&philos->sim->fork_mutex[(philos->index + 1)
 		% philos->sim->no_of_philos]);
-	// printf("P%d locking first fork\n", philos->id);
+	if (!death_checker(philos->sim))
+		print_msg(philos, MSG_FORK);
 	pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
-	// printf("P%d locking second fork\n", philos->id);
+	if (!death_checker(philos->sim))
+		print_msg(philos, MSG_FORK);
 	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
 	philos->last_meal = get_time_in_ms();
 	philos->meals_eaten++;
 	pthread_mutex_unlock(&philos->sim->meal_mutex[index]);
-	print_msg(philos, MSG_EAT);
+	if (!death_checker(philos->sim))
+		print_msg(philos, MSG_EAT);
 	ft_usleep(philos->sim->time_to_eat, philos->sim);
 	pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
 	pthread_mutex_unlock(&philos->sim->fork_mutex[(philos->index + 1)
 		% philos->sim->no_of_philos]);
 }
-

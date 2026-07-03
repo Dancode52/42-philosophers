@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/02 13:49:26 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/03 12:33:50 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,47 +22,32 @@ void	free_things(t_sim *sim)
 		free(sim->philos);
 }
 
-int check_starvation(t_sim *sim, int index)
+int	check_starvation(t_sim *sim, int index)
 {
-    int starvation = 0;
+	int	starvation;
 
-    pthread_mutex_lock(&sim->meal_mutex[index]);
-
-    if (sim->philos[index].meals_eaten >= sim->no_of_meals
-        && sim->no_of_meals != -1)
-    {
-        pthread_mutex_unlock(&sim->meal_mutex[index]);
-        return (0);
-    }
-
-    if (get_time_in_ms() - sim->philos[index].last_meal
-        > (size_t)sim->time_to_die)
-        starvation = 1;
-
-    pthread_mutex_unlock(&sim->meal_mutex[index]);
-
-    return starvation;
+	starvation = 0;
+	pthread_mutex_lock(&sim->meal_mutex[index]);
+	// if (sim->philos[index].meals_eaten >= sim->no_of_meals
+	// 	&& sim->no_of_meals != -1)
+	// {
+	// 	pthread_mutex_unlock(&sim->meal_mutex[index]);
+	// 	return (0);
+	// }
+	if (get_time_in_ms() - sim->philos[index].last_meal
+		> (size_t)sim->time_to_die)
+		starvation = 1;
+	pthread_mutex_unlock(&sim->meal_mutex[index]);
+	return (starvation);
 }
-
-// int	check_starvation(t_sim *sim, int index)
-// {
-// 	int		starvation;
-// 	size_t	current_time;
-
-// 	starvation = 0;
-// 	pthread_mutex_lock(&sim->meal_mutex[index]);
-// 	current_time = get_time_in_ms();
-// 	if (current_time - sim->philos[index].last_meal > (size_t)sim->time_to_die)
-// 		starvation = 1;
-// 	pthread_mutex_unlock(&sim->meal_mutex[index]);
-// 	return (starvation);
-// }
 
 int	all_full(t_sim *sim)
 {
 	int	i;
 
 	i = 0;
+	if (sim->no_of_meals == -1)
+		return (0);
 	while (i < sim->no_of_philos)
 	{
 		pthread_mutex_lock(&sim->meal_mutex[i]);
@@ -86,13 +71,6 @@ void	*monitoring(void *param)
 	while (!death_checker(sim))
 	{
 		i = 0;
-		if (sim->no_of_meals != -1 && all_full(sim))
-		{
-			pthread_mutex_lock(&sim->death_mutex);
-			sim->death = 1;
-			pthread_mutex_unlock(&sim->death_mutex);
-			return (NULL);
-		}
 		while (i < sim->no_of_philos)
 		{
 			if (check_starvation(sim, i))
@@ -102,14 +80,20 @@ void	*monitoring(void *param)
 				pthread_mutex_unlock(&sim->death_mutex);
 				print_msg(&sim->philos[i], MSG_DIED);
 				return (NULL);
-			};
+			}
+			if (all_full(sim))
+			{
+				pthread_mutex_lock(&sim->death_mutex);
+				sim->death = 1;
+				pthread_mutex_unlock(&sim->death_mutex);
+				return (NULL);
+			}
 			i++;
 		}
-		usleep(1000);
+		usleep(100);
 	}
 	return (NULL);
 }
-
 
 int	check_full(t_philo *philos)
 {
@@ -125,16 +109,14 @@ int	check_full(t_philo *philos)
 
 void	*philo_routine(void *param)
 {
-	t_philo *philos;
+	t_philo	*philos;
 
 	philos = (t_philo *)param;
-
 	if (philos->sim->no_of_philos == 1)
 	{
 		pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
-		while(philos->sim->death != 1)
+		while (philos->sim->death != 1)
 			ft_usleep(5, philos->sim);
-		print_msg(philos, MSG_DIED);
 		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
 		return (NULL);
 	}
@@ -142,15 +124,11 @@ void	*philo_routine(void *param)
 		ft_usleep(philos->sim->time_to_eat, philos->sim);
 	while (!death_checker(philos->sim) && !(check_full(philos)))
 	{
-		//eating
-
 		ph_eating(philos, philos->index);
-		//sleeping
 		if (death_checker(philos->sim) || check_full(philos))
 			return (NULL);
 		print_msg(philos, MSG_SLEEP);
 		ft_usleep(philos->sim->time_to_sleep, philos->sim);
-		//thinking
 		if (death_checker(philos->sim))
 			return (NULL);
 		print_msg(philos, MSG_THINK);

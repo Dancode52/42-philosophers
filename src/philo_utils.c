@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 09:01:47 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/01 08:30:50 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/03 12:24:19 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ int	ft_usleep(size_t ms, t_sim *sim)
 	{
 		if (death_checker(sim))
 			return (1);
-		usleep(500);
+		usleep(200);
 	}
 	return (0);
 }
