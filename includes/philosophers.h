@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/02 12:51:03 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/22 13:06:58 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,8 @@ void	printeatmsg(t_philo *philo, size_t garbage);
 void	printsleepmsg(t_philo *philo, size_t garbage);
 void	eat_sleep(t_philo *philo, size_t *start);
 int		ft_usleep(size_t ms, t_sim *sim);
-void	*monitoring(void *param);
 void	*philo_routine(void *param);
-int		make_threads(t_sim *sim);
+int		start_threads(t_sim *sim);
 int		destroy_mutexes(t_sim *sim);
 void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j);
 int		death_checker(t_sim *sim);
@@ -79,5 +78,9 @@ void	odd_eat(t_philo *philos, int index);
 void	even_eat(t_philo *philos, int index);
 void	print_msg(t_philo *philos, t_msg_type type);
 int		ft_atoi(const char *str);
+
+int		check_starvation(t_sim *sim, int index);
+int		all_full(t_sim *sim);
+void	*monitoring(void *param);
 
 #endif
