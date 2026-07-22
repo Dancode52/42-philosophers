@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/03 11:12:08 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/22 15:56:48 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,20 +40,6 @@ int	death_checker(t_sim *sim)
 	dead = sim->death;
 	pthread_mutex_unlock(&sim->death_mutex);
 	return (dead);
-}
-
-int	meal_checker(t_sim *sim, int index)
-{
-	int	full;
-
-	full = 0;
-	pthread_mutex_lock(&sim->meal_mutex[index]);
-	if (sim->philos[index].meals_eaten == sim->no_of_meals)
-		full = 1;
-	pthread_mutex_unlock(&sim->meal_mutex[index]);
-	if (full)
-		printf("P%d exiting because full\n", index);
-	return (full);
 }
 
 int	ph_eating(t_philo *philos, int index)
