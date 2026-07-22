@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/02 12:51:31 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/22 15:56:24 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,49 +54,24 @@ static int	create_mutex(t_sim *sim)
 	return (0);
 }
 
-// void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j)
-// {
-// 	int	i;
+int	init_philosophers(t_sim *sim)
+{
+	int	i;
 
-// 	i = 0;
-// 	while (i < j)
-// 	{
-// 		pthread_mutex_destroy(&ptr[i]);
-// 		i++;
-// 	}
-// 	if (sim->fork_mutex)
-// 		free(sim->fork_mutex);
-// 	if (sim->philos)
-// 		free(sim->philos);
-// 	return ;
-// }
-
-// int	ft_atoi(const char *str)
-// {
-// 	int	i;
-// 	int	nb;
-// 	int	s;
-
-// 	i = 0;
-// 	nb = 0;
-// 	s = 1;
-// 	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
-// 		i++;
-// 	if (str[i] == '+' || str[i] == '-')
-// 	{
-// 		if (str[i] == '-')
-// 			s = s * -1;
-// 		i++;
-// 	}
-// 	if (!(str[i] >= '0' && str[i] <= '9'))
-// 		return (0);
-// 	while (str[i] >= '0' && str[i] <= '9')
-// 	{
-// 		nb = nb * 10 + (str[i] - '0');
-// 		i++;
-// 	}
-// 	return (nb * s);
-// }
+	sim->philos = malloc(sim->no_of_philos * sizeof(t_philo));
+	if (!sim->philos)
+		return (1);
+	i = 0;
+	while (i < sim->no_of_philos)
+	{
+		sim->philos[i].index = i;
+		sim->philos[i].id = i + 1;
+		sim->philos[i].sim = sim;
+		sim->philos[i].last_meal = sim->progstart;
+		i++;
+	}
+	return (0);
+}
 
 int	init_sim(char **argv, t_sim *sim)
 {
@@ -113,10 +88,8 @@ int	init_sim(char **argv, t_sim *sim)
 		sim->no_of_meals = ft_atoi(argv[5]);
 	else
 		sim->no_of_meals = -1;
-	sim->philos = malloc(sim->no_of_philos * sizeof(t_philo));
-	if (!sim->philos)
+	if (init_philosophers(sim) != 0)
 		return (1);
-	memset(sim->philos, 0, sim->no_of_philos * sizeof(t_philo));
 	if (create_mutex(sim) != 0)
 	{
 		free(sim->philos);
