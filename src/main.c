@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/03 12:33:50 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/22 15:55:26 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,91 +20,6 @@ void	free_things(t_sim *sim)
 		free(sim->meal_mutex);
 	if (sim->philos)
 		free(sim->philos);
-}
-
-int	check_starvation(t_sim *sim, int index)
-{
-	int	starvation;
-
-	starvation = 0;
-	pthread_mutex_lock(&sim->meal_mutex[index]);
-	// if (sim->philos[index].meals_eaten >= sim->no_of_meals
-	// 	&& sim->no_of_meals != -1)
-	// {
-	// 	pthread_mutex_unlock(&sim->meal_mutex[index]);
-	// 	return (0);
-	// }
-	if (get_time_in_ms() - sim->philos[index].last_meal
-		> (size_t)sim->time_to_die)
-		starvation = 1;
-	pthread_mutex_unlock(&sim->meal_mutex[index]);
-	return (starvation);
-}
-
-int	all_full(t_sim *sim)
-{
-	int	i;
-
-	i = 0;
-	if (sim->no_of_meals == -1)
-		return (0);
-	while (i < sim->no_of_philos)
-	{
-		pthread_mutex_lock(&sim->meal_mutex[i]);
-		if (sim->philos[i].meals_eaten < sim->no_of_meals)
-		{
-			pthread_mutex_unlock(&sim->meal_mutex[i]);
-			return (0);
-		}
-		pthread_mutex_unlock(&sim->meal_mutex[i]);
-		i++;
-	}
-	return (1);
-}
-
-void	*monitoring(void *param)
-{
-	t_sim	*sim;
-	int		i;
-
-	sim = (t_sim *)param;
-	while (!death_checker(sim))
-	{
-		i = 0;
-		while (i < sim->no_of_philos)
-		{
-			if (check_starvation(sim, i))
-			{
-				pthread_mutex_lock(&sim->death_mutex);
-				sim->death = 1;
-				pthread_mutex_unlock(&sim->death_mutex);
-				print_msg(&sim->philos[i], MSG_DIED);
-				return (NULL);
-			}
-			if (all_full(sim))
-			{
-				pthread_mutex_lock(&sim->death_mutex);
-				sim->death = 1;
-				pthread_mutex_unlock(&sim->death_mutex);
-				return (NULL);
-			}
-			i++;
-		}
-		usleep(100);
-	}
-	return (NULL);
-}
-
-int	check_full(t_philo *philos)
-{
-	pthread_mutex_lock(&philos->sim->meal_mutex[philos->index]);
-	if (philos->meals_eaten != philos->sim->no_of_meals)
-	{
-		pthread_mutex_unlock(&philos->sim->meal_mutex[philos->index]);
-		return (0);
-	}
-	pthread_mutex_unlock(&philos->sim->meal_mutex[philos->index]);
-	return (1);
 }
 
 void	*philo_routine(void *param)
@@ -122,10 +37,10 @@ void	*philo_routine(void *param)
 	}
 	if (philos->id % 2 == 1)
 		ft_usleep(philos->sim->time_to_eat, philos->sim);
-	while (!death_checker(philos->sim) && !(check_full(philos)))
+	while (!death_checker(philos->sim))
 	{
 		ph_eating(philos, philos->index);
-		if (death_checker(philos->sim) || check_full(philos))
+		if (death_checker(philos->sim))
 			return (NULL);
 		print_msg(philos, MSG_SLEEP);
 		ft_usleep(philos->sim->time_to_sleep, philos->sim);
@@ -136,37 +51,64 @@ void	*philo_routine(void *param)
 	return (NULL);
 }
 
+int	set_up_sim(int argc, char **argv, t_sim *sim)
+{
+	int	error;
+
+	sim->progstart = get_time_in_ms();
+	if (argc < 5 || argc > 6)
+		return (1);
+	error = init_sim(argv, sim);
+	if (error == 1)
+		return (1);
+	return (0);
+}
+
+int	run_sim(t_sim *sim)
+{
+	int	error;
+	int	i;
+
+	i = 0;
+	error = start_threads(sim);
+	if (error == 1)
+	{
+		destroy_mutexes(sim);
+		free_things(sim);
+		return (1);
+	}
+	if (sim->no_of_philos == 1)
+	{
+		pthread_join(sim->philos[0].philo_t, NULL);
+		error = destroy_mutexes(sim);
+		free_things(sim);
+		return (0);
+	}
+	i = 0;
+	while (i < sim->no_of_philos)
+	{
+		pthread_join(sim->philos[i].philo_t, NULL);
+		i++;
+	}
+	return (0);
+}
+
 int	main(int argc, char **argv)
 {
 	t_sim	sim;
-	int		i;
 	int		error;
 
-	sim.progstart = get_time_in_ms();
-	i = 0;
-	if (argc < 5 || argc > 6)
+	if (set_up_sim(argc, argv, &sim) != 0)
 		return (1);
-	error = init_sim(argv, &sim);
-	if (error != 0)
-		return (1);
-	error = make_threads(&sim);
-	if (error == 1)
-		return (1);
-	if (sim.no_of_philos == 1)
+	if (run_sim(&sim) != 0)
 	{
-		pthread_join(sim.philos[0].philo_t, NULL);
-		error = destroy_mutexes(&sim);
+		destroy_mutexes(&sim);
 		free_things(&sim);
-		return (0);
-	}
-	while (i < sim.no_of_philos)
-	{
-		pthread_join(sim.philos[i].philo_t, NULL);
-		i++;
+		return (1);
 	}
 	error = destroy_mutexes(&sim);
-	if (error == 1)
-		return (1);
 	free_things(&sim);
+	if (error != 0)
+		return (1);
 	return (0);
 }
