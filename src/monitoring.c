@@ -1,0 +1,80 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitoring.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/22 12:09:25 by dlanehar          #+#    #+#             */
+/*   Updated: 2026/07/22 12:09:51 by dlanehar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "philosophers.h"
+
+int	check_starvation(t_sim *sim, int index)
+{
+	int	starvation;
+
+	starvation = 0;
+	pthread_mutex_lock(&sim->meal_mutex[index]);
+	if (get_time_in_ms() - sim->philos[index].last_meal
+		> (size_t)sim->time_to_die)
+		starvation = 1;
+	pthread_mutex_unlock(&sim->meal_mutex[index]);
+	return (starvation);
+}
+
+int	all_full(t_sim *sim)
+{
+	int	i;
+
+	i = 0;
+	if (sim->no_of_meals == -1)
+		return (0);
+	while (i < sim->no_of_philos)
+	{
+		pthread_mutex_lock(&sim->meal_mutex[i]);
+		if (sim->philos[i].meals_eaten < sim->no_of_meals)
+		{
+			pthread_mutex_unlock(&sim->meal_mutex[i]);
+			return (0);
+		}
+		pthread_mutex_unlock(&sim->meal_mutex[i]);
+		i++;
+	}
+	return (1);
+}
+
+void	*monitoring(void *param)
+{
+	t_sim	*sim;
+	int		i;
+
+	sim = (t_sim *)param;
+	while (!death_checker(sim))
+	{
+		i = 0;
+		while (i < sim->no_of_philos)
+		{
+			if (check_starvation(sim, i))
+			{
+				pthread_mutex_lock(&sim->death_mutex);
+				sim->death = 1;
+				pthread_mutex_unlock(&sim->death_mutex);
+				print_msg(&sim->philos[i], MSG_DIED);
+				return (NULL);
+			}
+			if (all_full(sim))
+			{
+				pthread_mutex_lock(&sim->death_mutex);
+				sim->death = 1;
+				pthread_mutex_unlock(&sim->death_mutex);
+				return (NULL);
+			}
+			i++;
+		}
+		usleep(100);
+	}
+	return (NULL);
+}
