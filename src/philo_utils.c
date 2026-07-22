@@ -6,13 +6,27 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 09:01:47 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/03 12:24:19 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/22 15:57:50 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int	make_threads(t_sim *sim)
+static void	threads_clean_exit(t_sim *sim, int i)
+{
+	pthread_mutex_lock(&sim->death_mutex);
+	sim->death = 1;
+	pthread_mutex_unlock(&sim->death_mutex);
+	while (i > 0)
+	{
+		i--;
+		pthread_join(sim->philos[i].philo_t, NULL);
+	}
+	free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
+	free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
+}
+
+int	start_threads(t_sim *sim)
 {
 	int	i;
 	int	error;
@@ -20,21 +34,39 @@ int	make_threads(t_sim *sim)
 	i = 0;
 	while (i < sim->no_of_philos)
 	{
-		sim->philos[i].index = i;
-		sim->philos[i].id = i + 1;
-		sim->philos[i].sim = sim;
-		sim->philos[i].last_meal = sim->progstart;
 		error = pthread_create(&sim->philos[i].philo_t, NULL, philo_routine,
 				&sim->philos[i]);
 		if (error != 0)
-			break ;
+		{
+			threads_clean_exit(sim, i);
+			// pthread_mutex_lock(&sim->death_mutex);
+			// sim->death = 1;
+			// pthread_mutex_unlock(&sim->death_mutex);
+			// while (i > 0)
+			// {
+			// 	i--;
+			// 	pthread_join(sim->philos[i].philo_t, NULL);
+			// }
+			// free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
+			// free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
+			return (1);
+		}
 		i++;
 	}
 	error = pthread_create(&sim->monitor, NULL, monitoring, sim);
 	if (error != 0)
 	{
-		free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
-		free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
+		threads_clean_exit(sim ,i);
+		// pthread_mutex_lock(&sim->death_mutex);
+		// sim->death = 1;
+		// pthread_mutex_unlock(&sim->death_mutex);
+		// while (i > 0)
+		// {
+		// 	i--;
+		// 	pthread_join(sim->philos[i].philo_t, NULL);
+		// }
+		// free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
+		// free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
 		return (1);
 	}
 	pthread_detach(sim->monitor);
