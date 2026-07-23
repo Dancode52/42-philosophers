@@ -6,21 +6,11 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/22 15:55:26 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/23 16:48:42 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-void	free_things(t_sim *sim)
-{
-	if (sim->fork_mutex)
-		free(sim->fork_mutex);
-	if (sim->meal_mutex)
-		free(sim->meal_mutex);
-	if (sim->philos)
-		free(sim->philos);
-}
 
 void	*philo_routine(void *param)
 {
@@ -55,7 +45,6 @@ int	set_up_sim(int argc, char **argv, t_sim *sim)
 {
 	int	error;
 
-	sim->progstart = get_time_in_ms();
 	if (argc < 5 || argc > 6)
 		return (1);
 	error = init_sim(argv, sim);
@@ -72,16 +61,10 @@ int	run_sim(t_sim *sim)
 	i = 0;
 	error = start_threads(sim);
 	if (error == 1)
-	{
-		destroy_mutexes(sim);
-		free_things(sim);
 		return (1);
-	}
 	if (sim->no_of_philos == 1)
 	{
 		pthread_join(sim->philos[0].philo_t, NULL);
-		error = destroy_mutexes(sim);
-		free_things(sim);
 		return (0);
 	}
 	i = 0;
@@ -96,19 +79,11 @@ int	run_sim(t_sim *sim)
 int	main(int argc, char **argv)
 {
 	t_sim	sim;
-	int		error;
+	int		sim_val;
 
 	if (set_up_sim(argc, argv, &sim) != 0)
 		return (1);
-	if (run_sim(&sim) != 0)
-	{
-		destroy_mutexes(&sim);
-		free_things(&sim);
-		return (1);
-	}
-	error = destroy_mutexes(&sim);
-	free_things(&sim);
-	if (error != 0)
-		return (1);
-	return (0);
+	sim_val = run_sim(&sim);
+	cleanup(&sim);
+	return (sim_val);
 }

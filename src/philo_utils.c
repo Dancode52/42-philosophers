@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 09:01:47 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/22 15:57:50 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/23 16:40:58 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,6 @@ static void	threads_clean_exit(t_sim *sim, int i)
 		i--;
 		pthread_join(sim->philos[i].philo_t, NULL);
 	}
-	free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
-	free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
 }
 
 int	start_threads(t_sim *sim)
@@ -39,16 +37,6 @@ int	start_threads(t_sim *sim)
 		if (error != 0)
 		{
 			threads_clean_exit(sim, i);
-			// pthread_mutex_lock(&sim->death_mutex);
-			// sim->death = 1;
-			// pthread_mutex_unlock(&sim->death_mutex);
-			// while (i > 0)
-			// {
-			// 	i--;
-			// 	pthread_join(sim->philos[i].philo_t, NULL);
-			// }
-			// free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
-			// free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
 			return (1);
 		}
 		i++;
@@ -56,42 +44,10 @@ int	start_threads(t_sim *sim)
 	error = pthread_create(&sim->monitor, NULL, monitoring, sim);
 	if (error != 0)
 	{
-		threads_clean_exit(sim ,i);
-		// pthread_mutex_lock(&sim->death_mutex);
-		// sim->death = 1;
-		// pthread_mutex_unlock(&sim->death_mutex);
-		// while (i > 0)
-		// {
-		// 	i--;
-		// 	pthread_join(sim->philos[i].philo_t, NULL);
-		// }
-		// free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
-		// free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
+		threads_clean_exit(sim, i);
 		return (1);
 	}
 	pthread_detach(sim->monitor);
-	return (0);
-}
-
-int	destroy_mutexes(t_sim *sim)
-{
-	int	j;
-	int	error;
-
-	j = 0;
-	while (j < sim->no_of_philos)
-	{
-		error = pthread_mutex_destroy(&sim->fork_mutex[j]);
-		if (error != 0)
-			break ;
-		j++;
-	}
-	error = pthread_mutex_destroy(&sim->printf_mutex);
-	if (error != 0)
-	{
-		free(sim->fork_mutex);
-		return (1);
-	}
 	return (0);
 }
 

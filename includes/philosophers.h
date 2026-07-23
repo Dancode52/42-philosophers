@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/22 13:06:58 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/23 16:44:33 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,11 @@ void	eat_sleep(t_philo *philo, size_t *start);
 int		ft_usleep(size_t ms, t_sim *sim);
 void	*philo_routine(void *param);
 int		start_threads(t_sim *sim);
-int		destroy_mutexes(t_sim *sim);
-void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j);
+
+void	destroy_mutexes(pthread_mutex_t *ptr, int j);
+void	free_things(t_sim *sim);
+void	cleanup(t_sim *sim);
+
 int		death_checker(t_sim *sim);
 int		meal_checker(t_sim *sim, int index);
 int		init_mutexes(t_sim *sim);

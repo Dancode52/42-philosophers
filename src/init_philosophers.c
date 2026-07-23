@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:52:18 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/22 15:56:24 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/23 16:36:28 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	mutex_init_loop(t_sim *sim, pthread_mutex_t *ptr)
 		error = pthread_mutex_init(&ptr[i], NULL);
 		if (error != 0)
 		{
-			free_and_destroy(sim, ptr, i);
+			destroy_mutexes(ptr, i);
 			return (1);
 		}
 		i++;

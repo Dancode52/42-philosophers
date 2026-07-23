@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 12:09:25 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/22 12:09:51 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/23 16:43:25 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,13 @@ int	all_full(t_sim *sim)
 	return (1);
 }
 
+static void	set_death(t_sim *sim)
+{
+	pthread_mutex_lock(&sim->death_mutex);
+	sim->death = 1;
+	pthread_mutex_unlock(&sim->death_mutex);
+}
+
 void	*monitoring(void *param)
 {
 	t_sim	*sim;
@@ -59,17 +66,13 @@ void	*monitoring(void *param)
 		{
 			if (check_starvation(sim, i))
 			{
-				pthread_mutex_lock(&sim->death_mutex);
-				sim->death = 1;
-				pthread_mutex_unlock(&sim->death_mutex);
+				set_death(sim);
 				print_msg(&sim->philos[i], MSG_DIED);
 				return (NULL);
 			}
 			if (all_full(sim))
 			{
-				pthread_mutex_lock(&sim->death_mutex);
-				sim->death = 1;
-				pthread_mutex_unlock(&sim->death_mutex);
+				set_death(sim);
 				return (NULL);
 			}
 			i++;

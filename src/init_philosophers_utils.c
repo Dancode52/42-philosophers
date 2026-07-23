@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 16:43:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/02 12:51:35 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/23 16:45:14 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,48 +14,27 @@
 
 int	init_mutexes(t_sim *sim)
 {
-	int	error1;
-	int	error2;
-
-	error1 = mutex_init_loop(sim, sim->fork_mutex);
-	if (error1 != 0)
+	if (mutex_init_loop(sim, sim->fork_mutex) != 0)
 		return (1);
-	error2 = mutex_init_loop(sim, sim->meal_mutex);
-	if (error2 != 0)
+	if (mutex_init_loop(sim, sim->meal_mutex) != 0)
 	{
-		free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
+		destroy_mutexes(sim->fork_mutex, sim->no_of_philos);
 		return (1);
 	}
 	if (pthread_mutex_init(&sim->printf_mutex, NULL) != 0)
 	{
-		free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
-		free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
+		destroy_mutexes(sim->fork_mutex, sim->no_of_philos);
+		destroy_mutexes(sim->meal_mutex, sim->no_of_philos);
 		return (1);
 	}
 	if (pthread_mutex_init(&sim->death_mutex, NULL) != 0)
 	{
-		free_and_destroy(sim, sim->fork_mutex, sim->no_of_philos);
-		free_and_destroy(sim, sim->meal_mutex, sim->no_of_philos);
+		destroy_mutexes(sim->fork_mutex, sim->no_of_philos);
+		destroy_mutexes(sim->meal_mutex, sim->no_of_philos);
+		pthread_mutex_destroy(&sim->printf_mutex);
 		return (1);
 	}
 	return (0);
-}
-
-void	free_and_destroy(t_sim *sim, pthread_mutex_t *ptr, int j)
-{
-	int	i;
-
-	i = 0;
-	while (i < j)
-	{
-		pthread_mutex_destroy(&ptr[i]);
-		i++;
-	}
-	if (sim->fork_mutex)
-		free(sim->fork_mutex);
-	if (sim->philos)
-		free(sim->philos);
-	return ;
 }
 
 int	ft_atoi(const char *str)
