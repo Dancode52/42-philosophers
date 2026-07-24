@@ -4,7 +4,7 @@ CFLAGS := -Wall -Werror -Wextra -g -I includes#-fsanitize=address
 
 SRC_DIR := src
 
-SRC := main.c init_philosophers.c philostuff.c philo_routine_helpers.c philo_routine_helpers_utils.c \
+SRC := main.c init_philosophers.c philo_routine_helpers.c philo_routine_helpers_utils.c \
 		philo_utils.c init_philosophers_utils.c monitoring.c cleanup.c
 
 SRC_FILES := $(addprefix ./$(SRC_DIR)/, $(SRC))

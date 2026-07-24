@@ -6,11 +6,21 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:30:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/23 16:48:42 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/24 14:57:31 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+static void	single_philo_func(t_philo *philos)
+{
+	pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
+	print_msg(philos, MSG_FORK);
+	while (!death_checker(philos->sim))
+		ft_usleep(5, philos->sim);
+	pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
+	return ;
+}
 
 void	*philo_routine(void *param)
 {
@@ -19,10 +29,7 @@ void	*philo_routine(void *param)
 	philos = (t_philo *)param;
 	if (philos->sim->no_of_philos == 1)
 	{
-		pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
-		while (philos->sim->death != 1)
-			ft_usleep(5, philos->sim);
-		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
+		single_philo_func(philos);
 		return (NULL);
 	}
 	if (philos->id % 2 == 1)
@@ -65,6 +72,7 @@ int	run_sim(t_sim *sim)
 	if (sim->no_of_philos == 1)
 	{
 		pthread_join(sim->philos[0].philo_t, NULL);
+		pthread_join(sim->monitor, NULL);
 		return (0);
 	}
 	i = 0;
@@ -73,6 +81,7 @@ int	run_sim(t_sim *sim)
 		pthread_join(sim->philos[i].philo_t, NULL);
 		i++;
 	}
+	pthread_join(sim->monitor, NULL);
 	return (0);
 }
 

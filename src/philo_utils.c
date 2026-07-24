@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 09:01:47 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/23 16:40:58 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/24 12:15:12 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ int	start_threads(t_sim *sim)
 		threads_clean_exit(sim, i);
 		return (1);
 	}
-	pthread_detach(sim->monitor);
 	return (0);
 }
 
