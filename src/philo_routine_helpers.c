@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/22 15:56:48 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/24 14:18:11 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,11 @@ void	print_msg(t_philo *philos, t_msg_type type)
 
 	pthread_mutex_lock(&philos->sim->printf_mutex);
 	time = get_time_in_ms() - philos->sim->progstart;
+	if (death_checker(philos->sim))
+	{
+		pthread_mutex_unlock(&philos->sim->printf_mutex);
+		return ;
+	}
 	if (type == MSG_FORK)
 		printf("%zu %d has taken a fork\n", time, philos->id);
 	else if (type == MSG_EAT)
@@ -26,8 +31,6 @@ void	print_msg(t_philo *philos, t_msg_type type)
 		printf("%zu %d is sleeping\n", time, philos->id);
 	else if (type == MSG_THINK)
 		printf("%zu %d is thinking\n", time, philos->id);
-	else if (type == MSG_DIED)
-		printf("%zu %d died\n", time, philos->id);
 	pthread_mutex_unlock(&philos->sim->printf_mutex);
 	return ;
 }

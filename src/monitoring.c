@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 12:09:25 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/23 16:43:25 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/24 14:15:42 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,19 @@ static void	set_death(t_sim *sim)
 	pthread_mutex_lock(&sim->death_mutex);
 	sim->death = 1;
 	pthread_mutex_unlock(&sim->death_mutex);
+	return ;
+}
+
+static void	death_event(t_sim *sim, int id)
+{
+	size_t	time;
+
+	pthread_mutex_lock(&sim->printf_mutex);
+	time = get_time_in_ms() - sim->progstart;
+	set_death(sim);
+	printf("%zu %d died\n", time, id);
+	pthread_mutex_unlock(&sim->printf_mutex);
+	return ;
 }
 
 void	*monitoring(void *param)
@@ -66,16 +79,15 @@ void	*monitoring(void *param)
 		{
 			if (check_starvation(sim, i))
 			{
-				set_death(sim);
-				print_msg(&sim->philos[i], MSG_DIED);
-				return (NULL);
-			}
-			if (all_full(sim))
-			{
-				set_death(sim);
+				death_event(sim, sim->philos[i].id);
 				return (NULL);
 			}
 			i++;
+		}
+		if (all_full(sim))
+		{
+			set_death(sim);
+			return (NULL);
 		}
 		usleep(100);
 	}
