@@ -6,11 +6,11 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 09:01:47 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/24 12:15:12 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/29 15:01:42 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "../includes/philosophers.h"
 
 static void	threads_clean_exit(t_sim *sim, int i)
 {
@@ -62,7 +62,6 @@ int	ft_usleep(size_t ms, t_sim *sim)
 {
 	size_t	start;
 
-	(void)sim;
 	start = get_time_in_ms();
 	while ((get_time_in_ms() - start) < ms)
 	{

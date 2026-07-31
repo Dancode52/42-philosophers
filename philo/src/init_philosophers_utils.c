@@ -6,11 +6,11 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/19 16:43:42 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/23 16:45:14 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/29 11:02:07 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "../includes/philosophers.h"
 
 int	init_mutexes(t_sim *sim)
 {

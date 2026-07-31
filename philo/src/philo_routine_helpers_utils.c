@@ -6,11 +6,11 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/18 18:13:40 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/24 15:02:25 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/31 09:44:46 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "../includes/philosophers.h"
 
 void	odd_eat(t_philo *philos, int index)
 {
@@ -19,6 +19,13 @@ void	odd_eat(t_philo *philos, int index)
 	pthread_mutex_lock(&philos->sim->fork_mutex[(philos->index + 1)
 		% philos->sim->no_of_philos]);
 	print_msg(philos, MSG_FORK);
+	if (death_checker(philos->sim))
+	{
+		pthread_mutex_unlock(&philos->sim->fork_mutex[(philos->index + 1)
+			% philos->sim->no_of_philos]);
+		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
+		return ;
+	}
 	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
 	philos->last_meal = get_time_in_ms();
 	philos->meals_eaten++;
@@ -37,6 +44,13 @@ void	even_eat(t_philo *philos, int index)
 	print_msg(philos, MSG_FORK);
 	pthread_mutex_lock(&philos->sim->fork_mutex[philos->index]);
 	print_msg(philos, MSG_FORK);
+	if (death_checker(philos->sim))
+	{
+		pthread_mutex_unlock(&philos->sim->fork_mutex[philos->index]);
+		pthread_mutex_unlock(&philos->sim->fork_mutex[(philos->index + 1)
+			% philos->sim->no_of_philos]);
+		return ;
+	}
 	pthread_mutex_lock(&philos->sim->meal_mutex[index]);
 	philos->last_meal = get_time_in_ms();
 	philos->meals_eaten++;

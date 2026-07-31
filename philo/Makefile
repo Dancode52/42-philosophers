@@ -1,6 +1,6 @@
 NAME := philo
 CC := cc
-CFLAGS := -Wall -Werror -Wextra -g -I includes#-fsanitize=address
+CFLAGS := -Wall -Werror -Wextra -g -I includes
 
 SRC_DIR := src
 

@@ -6,7 +6,7 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 10:43:03 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/24 12:38:37 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/29 09:53:58 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,18 @@
 # include <unistd.h>
 # include <sys/time.h>
 
-typedef	struct	s_sim	t_sim;
+typedef struct s_sim	t_sim;
 
 typedef enum e_msg_type
 {
-    MSG_FORK,
-    MSG_EAT,
-    MSG_SLEEP,
-    MSG_THINK,
-    MSG_DIED
-} t_msg_type;
+	MSG_FORK,
+	MSG_EAT,
+	MSG_SLEEP,
+	MSG_THINK,
+	MSG_DIED
+}	t_msg_type;
 
-typedef	struct	s_philo
+typedef struct s_philo
 {
 	int			index;
 	int			id;

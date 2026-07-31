@@ -6,11 +6,11 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 16:43:46 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/23 16:45:20 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/29 11:02:07 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "../includes/philosophers.h"
 
 void	free_things(t_sim *sim)
 {

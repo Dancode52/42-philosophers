@@ -6,11 +6,11 @@
 /*   By: dlanehar <dlanehar@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 12:09:25 by dlanehar          #+#    #+#             */
-/*   Updated: 2026/07/24 14:15:42 by dlanehar         ###   ########.fr       */
+/*   Updated: 2026/07/29 15:22:43 by dlanehar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "../includes/philosophers.h"
 
 int	check_starvation(t_sim *sim, int index)
 {
